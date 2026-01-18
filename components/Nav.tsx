@@ -111,7 +111,7 @@ export default function Nav({
               src="/favicons/android-chrome-192x192.png"
               width={36}
               height={36}
-              alt=""
+              alt="cennik online dla firm strona internetowa cennikonline.pl"
               className="w-8 h-8 mr-2"
             />{" "}
             Panel administracyjny

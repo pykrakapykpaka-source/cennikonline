@@ -245,14 +245,14 @@ export default function Leads() {
         src="/toilet3.gif"
         width={200}
         height={200}
-        alt=""
+        alt="cennik online dla firm strona internetowa cennikonline.pl"
         className={`opacity-0 w-1/2 fixed -left-[1000px]`}
       />
       <Image
         src="/dolar.gif"
         width={200}
         height={200}
-        alt=""
+        alt="cennik online dla firm strona internetowa cennikonline.pl"
         className={`opacity-0 w-1/2 fixed -left-[1000px]`}
       />
     </>

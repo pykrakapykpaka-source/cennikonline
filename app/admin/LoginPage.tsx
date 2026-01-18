@@ -83,10 +83,10 @@ export default function LoginPage() {
       </form>{" "}
       <h1 className="text-center text-2xl  bg-gradient-to-br from-zinc-600 via-zinc-600 to-zinc-600 text-white p-3 rounded-b-xl relative z-50">
         <Image
-          src="/logo-hexon2.png"
+          src="/logo.gif"
           width={200}
           height={200}
-          alt=""
+          alt="cennik online dla firm strona internetowa cennikonline.pl"
           className=""
         />
       </h1>

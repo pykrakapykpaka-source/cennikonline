@@ -91,10 +91,10 @@ export default function AdminLayout({
                   <div className={` duration-500 w-full pt-24 scrollbar`}>
                     <Link href="/" className="absolute left-20 top-6 z-50">
                       <Image
-                        src="/logo-hexon2.png"
+                        src="/logo.gif"
                         width={200}
                         height={200}
-                        alt=""
+                        alt="cennik online dla firm strona internetowa cennikonline.pl"
                         className="w-[150px]"
                       />
                     </Link>

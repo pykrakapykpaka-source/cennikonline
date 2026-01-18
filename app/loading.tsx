@@ -21,10 +21,10 @@ export default function Loading() {
           />
         </svg>
         <Image
-          src="/logo-hexon2.png"
+          src="/logo.gif"
           width={200}
           height={200}
-          alt=""
+          alt="cennik online dla firm strona internetowa cennikonline.pl"
           className="animate-pulse"
         />
       </div>

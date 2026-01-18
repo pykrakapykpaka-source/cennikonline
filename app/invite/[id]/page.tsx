@@ -15,10 +15,10 @@ export default async function Page({
     <div className="min-h-screen w-full relative font-sans">
       <Link href="/" className="absolute left-8 top-6 xl:top-12 z-[501]">
         <Image
-          src="/logo-hexon2.png"
+          src="/logo.gif"
           width={400}
           height={400}
-          alt=""
+          alt="cennik online dla firm strona internetowa cennikonline.pl"
           className="w-[150px] sm:w-[200px]"
         />
       </Link>

@@ -74,7 +74,7 @@ export default function LeadApplication({
                 width={400}
                 height={400}
                 src={"/toilet3.gif"}
-                alt=""
+                alt="cennik online dla firm strona internetowa cennikonline.pl"
                 className={`${
                   animationCheck ? "opacity-0" : "opacity-100"
                 } ease-in-out duration-500 w-[375px]`}
@@ -106,7 +106,7 @@ export default function LeadApplication({
             src="/dolar.gif"
             width={200}
             height={200}
-            alt=""
+            alt="cennik online dla firm strona internetowa cennikonline.pl"
             className={`w-1/2 ${isAnimating && "animate-bounce"}`}
           />
         </div>

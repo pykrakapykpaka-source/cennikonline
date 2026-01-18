@@ -81,7 +81,7 @@ export default async function Page({
                     src="/moneta.png"
                     width={100}
                     height={100}
-                    alt=""
+                    alt="cennik online dla firm strona internetowa cennikonline.pl"
                     className="w-6 h-6 rounded-full"
                   />
                   CennikOnline
@@ -101,12 +101,12 @@ export default async function Page({
           <div className="mt-24 mx-auto grid grid-cols-1 lg:grid-cols-2 h-max">
             <div className="rounded-2xl mt-2 z-50 bg-black/60 backdrop-blur border border-white/10 p-6 lg:p-12 flex flex-col justify-center h-full my-auto animate-fade-up-soft">
               <div className="mx-auto lg:mx-0 text-center lg:text-left">
-                <div className="flex flex-row items-center text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight">
+                <div className="flex flex-row items-center text-4xl font-extrabold tracking-tight">
                   <Image
                     src="/moneta.png"
                     width={100}
                     height={100}
-                    alt=""
+                    alt="cennik online dla firm strona internetowa cennikonline.pl"
                     className="w-16 h-16 rounded-full"
                   />
                   <span className="block bg-gradient-to-r from-[#C5FF17] to-[#33E5CF] bg-clip-text text-transparent">
@@ -124,7 +124,7 @@ export default async function Page({
                 </span>
               </p>
 
-              <ul className="mt-6 flex flex-row flex-wrap items-center justify-center gap-1.5 sm:gap-3 text-xs sm:text-sm text-white/80 list-none p-0 m-0">
+              <ul className="mt-6 flex flex-row flex-wrap items-center justify-center lg:justify-start gap-1.5 sm:gap-3 text-xs sm:text-sm text-white/80 list-none p-0 m-0">
                 <BenefitPill size="compact" label="Zrozumiała oferta" />
                 <BenefitPill size="compact" label="Mobile + SEO" />
                 <BenefitPill size="compact" label="Łatwa aktualizacja" />
@@ -143,7 +143,7 @@ export default async function Page({
                     src="/logo.gif"
                     width={100}
                     height={100}
-                    alt=""
+                    alt="cennik online dla firm strona internetowa cennikonline.pl"
                     className="w-48 h-48 rounded-full animate-move-from-right-to-left"
                   />
                   <span className="font-bold bg-gradient-to-r from-[#B4FC2D] to-[#3EE7C0] bg-clip-text text-transparent">
@@ -170,7 +170,7 @@ export default async function Page({
                         src="/moneta.png"
                         width={100}
                         height={100}
-                        alt=""
+                        alt="cennik online dla firm strona internetowa cennikonline.pl"
                         className="w-10 h-10 rounded-full"
                       />
                       <span className="bg-gradient-to-r from-[#C5FF17] to-[#33E5CF] bg-clip-text text-transparent">
@@ -344,7 +344,7 @@ export default async function Page({
                     src="/google.webp"
                     width={100}
                     height={100}
-                    alt=""
+                    alt="cennik online dla firm strona internetowa cennikonline.pl"
                     className="h-auto w-[100px] mx-auto"
                   />
               </div>
