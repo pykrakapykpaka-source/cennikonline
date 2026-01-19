@@ -6,6 +6,7 @@ import { Providers } from "@/common/redux/Provider";
 import ClientFormWrapper from "@/components/cta/ClientFormWrapper";
 import { Metadata } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { getSiteUrl } from "@/lib/siteUrl";
 export default async function Root({
   children,
 }: {
@@ -61,6 +62,7 @@ export default async function Root({
   );
 }
 export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
   viewport: "width=device-width, initial-scale=1",
   themeColor: "#ffffff",
   manifest: "/manifest.json",
@@ -69,7 +71,7 @@ export const metadata: Metadata = {
     "Cennik online, który sprzedaje: projekt, treści i wdrożenie w jednym. Zwiększ liczbę zapytań i zamykaj więcej klientów — dopasujemy cennik do Twojej branży.",
   openGraph: {
     type: "website",
-    url: "https://hexon.work",
+    url: "/",
     title: "Zamów cennik online | Gotowe cenniki dla firm",
     description:
       "Cennik online, który sprzedaje: projekt, treści i wdrożenie w jednym. Zwiększ liczbę zapytań i zamykaj więcej klientów.",

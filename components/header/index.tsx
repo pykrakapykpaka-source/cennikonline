@@ -110,7 +110,7 @@ export default function Header({ view = "default" }: HeaderProps) {
           )}
 
           <Link
-            href={view === "order" ? "#zamow" : "/zamow-cennik-online"}
+            href={view === "order" ? "#zamow" : "/zamow-cennik-online-dla-firm"}
             className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-br from-[#C5FF17] to-[#33E5CF] px-4 py-2 text-sm font-bold text-zinc-900 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-transform hover:scale-[1.03]"
           >
             <FaRegQuestionCircle className="h-4 w-4" />
