@@ -10,7 +10,7 @@ import ToiLead from "./ToiLead";
 import { FaCheckCircle } from "react-icons/fa";
 import { renderMarkdown } from "@/utils/parseMarkdown";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { toast } from "react-toastify";
+import { toast } from "@/lib/toastify";
 export default function Lead({
   forceVisibility,
   lead,

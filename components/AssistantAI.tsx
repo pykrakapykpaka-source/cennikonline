@@ -1,6 +1,4 @@
 "use client";
-import { app, createSession, pushSessionMessage } from "@/common/firebase";
-import { collection, getFirestore, onSnapshot } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import { FaRobot } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
@@ -43,30 +41,7 @@ export default function AssistantAI() {
     const id = uuidv4();
     if (!localStorage?.getItem("session")) {
       localStorage?.setItem("session", id);
-      createSession({
-        id: id,
-        messages: [],
-      });
     }
-  }, []);
-
-  // Auto-open the assistant after a short delay (once per visitor).
-  useEffect(() => {
-    const alreadyAutoOpened = localStorage?.getItem("assistantAutoOpened");
-    if (alreadyAutoOpened === "true") return;
-
-    const t = window.setTimeout(() => {
-      localStorage?.setItem("assistantAutoOpened", "true");
-
-      // Match the behavior of clicking the launcher: mark as checked out
-      // so the UI stays compact and doesn't show the intro text again.
-      localStorage?.setItem("isCheckedOut", "true");
-      setIsCheckedOut(true);
-
-      setAssistantOpen(true);
-    }, 7000);
-
-    return () => window.clearTimeout(t);
   }, []);
 
   const sendMessage = async (text: string) => {
@@ -79,39 +54,30 @@ export default function AssistantAI() {
     setLoading(true);
     setUserQuestion("");
     try {
-      pushSessionMessage(
-        {
-          content: trimmed,
-          role: "user",
-          id: uuidv4(),
-        },
-        sessionId
-      );
+      const userMsg: ChatMessage = {
+        content: trimmed,
+        role: "user",
+        id: uuidv4(),
+      };
+      setMessages((prev) => [...prev, userMsg]);
 
-      await getAnswer(trimmed, sessionId);
+      const res = await getAnswer(trimmed, sessionId);
+      const data = await res.json().catch(() => null);
+      const responseText: string | undefined =
+        data?.response ?? data?.answer ?? data?.content ?? undefined;
+
+      if (responseText) {
+        const assistantMsg: ChatMessage = {
+          content: responseText,
+          role: "assistant",
+          id: uuidv4(),
+        };
+        setMessages((prev) => [...prev, assistantMsg]);
+      }
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (!app) return;
-    const db = getFirestore(app);
-    const ref = collection(db, "publicSessions");
-    const unsub = onSnapshot(ref, (querySnapshot: any) => {
-      const snapshotData: any[] = [];
-      querySnapshot.forEach((doc: any) => {
-        snapshotData.push(doc.data());
-      });
-      const nextMessages =
-        snapshotData.filter(
-          (session) => session.id === localStorage?.getItem("session")
-        )[0]?.messages ?? [];
-
-      setMessages(nextMessages);
-    });
-    return () => unsub();
-  }, []);
 
   useEffect(() => {
     if (!assistantOpen) return;

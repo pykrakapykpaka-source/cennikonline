@@ -2,7 +2,7 @@
 import { app, updateCourse } from "@/common/firebase";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { collection, onSnapshot, getFirestore } from "firebase/firestore";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
 import "moment/locale/pl";
 import Link from "next/link";
 import { FaClock, FaLongArrowAltLeft } from "react-icons/fa";
@@ -12,16 +12,21 @@ export default function Courses() {
   const [filter, setFilter] = useState("");
   useEffect(() => {
     if (!app) return;
-    const db = getFirestore(app);
-    const ref = collection(db, "courses");
-    const unsub = onSnapshot(ref, (querySnapshot: any) => {
-      const snapshotData: any[] = [];
-      querySnapshot.forEach((doc: any) => {
-        snapshotData.push(doc.data());
-      });
-      setLeads(snapshotData);
-    });
-    return () => unsub();
+    let cancelled = false;
+    (async () => {
+      try {
+        const db = getFirestore(app);
+        const ref = collection(db, "courses");
+        const snap = await getDocs(ref);
+        const snapshotData = snap.docs.map((d) => d.data());
+        if (!cancelled) setLeads(snapshotData);
+      } catch (e) {
+        console.error("Failed to load courses:", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
   moment.locale("pl");
   return (

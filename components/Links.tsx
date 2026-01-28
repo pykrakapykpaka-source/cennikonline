@@ -3,7 +3,7 @@ import moment from "moment";
 import { useState } from "react";
 import { FaLink } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
+import { toast } from "@/lib/toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LinkComponent from "./LinkComponent";
 export default function Links({ links }: { links: any }) {

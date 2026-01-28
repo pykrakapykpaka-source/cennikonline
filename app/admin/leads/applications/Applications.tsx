@@ -2,7 +2,7 @@
 import { app, updateApplication } from "@/common/firebase";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { collection, onSnapshot, getFirestore } from "firebase/firestore";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
 import "moment/locale/pl";
 import Link from "next/link";
 import { FaClock, FaLongArrowAltLeft } from "react-icons/fa";
@@ -19,18 +19,25 @@ export default function Leads() {
   const [filter, setFilter] = useState("new");
   useEffect(() => {
     if (!app) return;
-    const db = getFirestore(app);
-    const ref = collection(db, "employees");
-    const unsub = onSnapshot(ref, (querySnapshot: any) => {
-      const snapshotData: any[] = [];
-      querySnapshot.forEach((doc: any) => {
-        snapshotData.push(doc.data());
-      });
-      setLeads(
-        snapshotData.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1))
-      );
-    });
-    return () => unsub();
+    let cancelled = false;
+    (async () => {
+      try {
+        const db = getFirestore(app);
+        const ref = collection(db, "employees");
+        const snap = await getDocs(ref);
+        const snapshotData = snap.docs.map((d) => d.data());
+        if (!cancelled) {
+          setLeads(
+            snapshotData.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1))
+          );
+        }
+      } catch (e) {
+        console.error("Failed to load applications:", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
   moment.locale("pl");
   return (

@@ -2,7 +2,7 @@
 import { app, updateMessage } from "@/common/firebase";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { collection, onSnapshot, getFirestore } from "firebase/firestore";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
 import "moment/locale/pl";
 import Link from "next/link";
 import { FaClock, FaLongArrowAltLeft } from "react-icons/fa";
@@ -13,30 +13,37 @@ export default function Leads() {
   const [filter, setFilter] = useState("");
   useEffect(() => {
     if (!app) return;
-    const db = getFirestore(app);
-    const ref = collection(db, "messages");
-    const unsub = onSnapshot(ref, (querySnapshot: any) => {
-      const snapshotData: any[] = [];
-      querySnapshot.forEach((doc: any) => {
-        snapshotData.push(doc.data());
-      });
-      setLeads(
-        snapshotData.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1))
-      );
-    });
-    const ref2 = collection(db, "sessions");
-    const unsub2 = onSnapshot(ref2, (querySnapshot: any) => {
-      const snapshotData: any[] = [];
-      querySnapshot.forEach((doc: any) => {
-        snapshotData.push(doc.data());
-      });
-      setSessions(
-        snapshotData.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1))
-      );
-    });
+    let cancelled = false;
+    (async () => {
+      try {
+        const db = getFirestore(app);
+        const ref = collection(db, "messages");
+        const snap = await getDocs(ref);
+        const snapshotData = snap.docs.map((d) => d.data());
+        if (!cancelled) {
+          setLeads(snapshotData.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1)));
+        }
+      } catch (e) {
+        console.error("Failed to load messages:", e);
+      }
+    })();
+    (async () => {
+      try {
+        const db = getFirestore(app);
+        const ref2 = collection(db, "sessions");
+        const snap2 = await getDocs(ref2);
+        const snapshotData2 = snap2.docs.map((d) => d.data());
+        if (!cancelled) {
+          setSessions(
+            snapshotData2.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1))
+          );
+        }
+      } catch (e) {
+        console.error("Failed to load sessions:", e);
+      }
+    })();
     return () => {
-      unsub();
-      unsub2();
+      cancelled = true;
     };
   }, []);
   moment.locale("pl");

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import { app, pushMessage, pushSession } from "@/common/firebase";
 import { useRouter } from "next/navigation";
-import { collection, getFirestore, onSnapshot } from "firebase/firestore";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import "moment/locale/pl";
 import Loading from "@/app/loading";
@@ -30,19 +30,25 @@ export default function ChooseTime({ linkId }: { linkId: any }) {
   const video = useRef<any>();
   useEffect(() => {
     if (!app) return;
-    const db = getFirestore(app);
-    const ref = collection(db, "links");
-    const unsub = onSnapshot(ref, (querySnapshot: any) => {
-      const snapshotData: any[] = [];
-      querySnapshot.forEach((doc: any) => {
-        snapshotData.push(doc.data());
-      });
-      const newData = snapshotData.map((item: any) => item.data);
-      setInvite(
-        newData.flat().filter((link: any) => link.link.includes(linkId))[0]
-      );
-    });
-    return () => unsub();
+    let cancelled = false;
+    (async () => {
+      try {
+        const db = getFirestore(app);
+        const ref = collection(db, "links");
+        const snap = await getDocs(ref);
+        const snapshotData = snap.docs.map((d) => d.data());
+        const newData = snapshotData.map((item: any) => item.data);
+        const nextInvite =
+          newData.flat().filter((link: any) => link.link.includes(linkId))[0] ??
+          undefined;
+        if (!cancelled) setInvite(nextInvite);
+      } catch (e) {
+        console.error("Failed to load invite link:", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [linkId]);
 
   const [data, setData] = useState<any>({

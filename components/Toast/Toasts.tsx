@@ -1,4 +1,4 @@
-import { Id, toast } from "react-toastify";
+import { Id, toast } from "@/lib/toastify";
 
 export function toastUpdate(
   msg: string,

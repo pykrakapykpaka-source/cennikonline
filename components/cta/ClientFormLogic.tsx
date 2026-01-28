@@ -2,9 +2,7 @@
 import { pushLead } from "@/common/firebase";
 import React, { useMemo, useState } from "react";
 import { FaArrowRight, FaCheckCircle } from "react-icons/fa";
-import { toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
-import Toast from "../Toast";
 import { useDispatch } from "react-redux";
 import { setModalVisible } from "@/common/redux/slices/actionSlice";
 import Success from "../Success";
@@ -136,6 +134,8 @@ export default function ClientFormLogic({
 }) {
   const dispatch = useDispatch();
   const [isSent, setIsSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [step, setStep] = useState(0);
 
   const [formData, setFormData] = useState<FormData>({
@@ -166,23 +166,14 @@ export default function ClientFormLogic({
   }
 
   const handleSubmit = async () => {
+    if (isSent || isSubmitting) return;
+
     if (!formData.name || !formData.phone || !formData.region) {
-      toast.error("Uzupełnij dane kontaktowe.", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark",
-      });
+      setSubmitError("Uzupełnij dane kontaktowe.");
       return;
     }
-
-    const id = toast.loading(<span>Wysyłanie formularza...</span>, {
-      position: "bottom-right",
-      theme: "dark",
-    });
+    setSubmitError(null);
+    setIsSubmitting(true);
 
     try {
       const payload: any = { ...formData, id: uuidv4() };
@@ -191,48 +182,18 @@ export default function ClientFormLogic({
       }
       await pushLead(payload);
       setIsSent(true);
-      toast.update(id, {
-        render: (
-          <span
-            onClick={() => {
-              dispatch(setModalVisible(""));
-            }}
-          >
-            Formularz wysłano pomyślnie!
-          </span>
-        ),
-        type: "success",
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark",
-        isLoading: false,
-      });
       setTimeout(() => {
         dispatch(setModalVisible(""));
       }, 5000);
     } catch (e) {
-      toast.update(id, {
-        render: <span>Nie udało się wysłać formularza. Spróbuj ponownie.</span>,
-        type: "error",
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark",
-        isLoading: false,
-      });
+      setSubmitError("Nie udało się wysłać formularza. Spróbuj ponownie.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div>
-      <Toast />
       {isSent && <Success />}
 
       <div className="flex flex-col relative">
@@ -308,6 +269,14 @@ export default function ClientFormLogic({
                 Dziękujemy za wysłanie zapytania!
               </div>
             )}
+            {!isSent && submitError && (
+              <div className="text-red-600 mt-3 font-light">{submitError}</div>
+            )}
+            {isSubmitting && (
+              <div className="text-zinc-600 mt-3 font-light">
+                Wysyłanie formularza...
+              </div>
+            )}
             <div className="flex items-center flex-wrap -ml-4">
               <div className="mt-4 ml-4">
                 <h2 className="sm:text-xl">Imię:</h2>
@@ -377,11 +346,12 @@ export default function ClientFormLogic({
                 Powrót
               </button>
               <button
-                disabled={isSent}
+                disabled={isSent || isSubmitting}
                 onClick={handleSubmit}
-                className="disabled:cursor-not-allowed flex flex-row items-center justify-center py-3 px-5 w-full text-base lg:w-max bg-gradient-to-br from-[#C5FF17] to-[#33E5CF] hover:scale-105 duration-200 ease-in-out text-zinc-800 rounded-lg cursor-pointer font-bold mt-2"
+                className="disabled:cursor-not-allowed disabled:opacity-70 flex flex-row items-center justify-center py-3 px-5 w-full text-base lg:w-max bg-gradient-to-br from-[#C5FF17] to-[#33E5CF] hover:scale-105 duration-200 ease-in-out text-zinc-800 rounded-lg cursor-pointer font-bold mt-2"
               >
-                Wyślij zapytanie <FaArrowRight className="ml-2" />
+                {isSubmitting ? "Wysyłanie..." : "Wyślij zapytanie"}
+                <FaArrowRight className="ml-2" />
               </button>
             </div>
           </div>

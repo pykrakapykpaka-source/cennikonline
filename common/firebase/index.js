@@ -129,49 +129,6 @@ export async function pushQuestion(data) {
   }
 }
 
-export async function getPublicSessions() {
-  const productDocRef = collection(db, "publicSessions");
-  const querySnapshot = await getDocs(productDocRef);
-  const sessions = [];
-  querySnapshot.forEach((doc) => {
-    sessions.push({ ...doc.data(), id: doc.id });
-  });
-  return sessions;
-}
-export async function pushSessionMessage(data, sessionId) {
-  const productDocRef = doc(collection(db, "publicSessions"), sessionId);
-  const docSnap = await getDoc(productDocRef);
-  if (docSnap.exists()) {
-    const currentData = docSnap.data();
-    const newData = {
-      ...currentData,
-      messages: [...currentData.messages, data],
-    };
-    await updateDoc(productDocRef, newData);
-    return productDocRef;
-  } else {
-    await setDoc(productDocRef, {
-      ...data,
-      createdAt: Date.now(),
-      messages: [data],
-    });
-    return productDocRef;
-  }
-}
-export async function createSession(data) {
-  const productDocRef = doc(collection(db, "publicSessions"), data.id);
-  const docSnap = await getDoc(productDocRef);
-  if (docSnap.exists()) {
-    return productDocRef;
-  } else {
-    await setDoc(productDocRef, {
-      ...data,
-      messages: [],
-    });
-    return productDocRef;
-  }
-}
-
 export async function getAssistantMessages() {
   try {
     const leadsRef = collection(db, "assistantMessages");

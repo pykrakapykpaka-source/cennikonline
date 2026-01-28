@@ -10,7 +10,7 @@ import { FaLightbulb } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { setLight } from "@/common/redux/slices/lightSlice";
 import { usePathname } from "next/navigation";
-import { collection, getFirestore, onSnapshot } from "firebase/firestore";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
 import dynamic from "next/dynamic";
 import Toast from "@/components/Toast";
 import Assistant from "@/components/assistant/Assistant";
@@ -25,29 +25,39 @@ export default function AdminLayout({
   const [mode, setMode] = useState("assistantMessages");
   useEffect(() => {
     if (!app) return;
-    const db = getFirestore(app);
-    const ref = collection(db, "assistantMessages");
-    const unsub = onSnapshot(ref, (querySnapshot: any) => {
-      const snapshotData: any[] = [];
-      querySnapshot.forEach((doc: any) => {
-        snapshotData.push(doc.data());
-      });
-      setAssistantMessages(snapshotData);
-    });
-    return () => unsub();
+    let cancelled = false;
+    (async () => {
+      try {
+        const db = getFirestore(app);
+        const ref = collection(db, "assistantMessages");
+        const snap = await getDocs(ref);
+        const snapshotData = snap.docs.map((d) => d.data());
+        if (!cancelled) setAssistantMessages(snapshotData);
+      } catch (e) {
+        console.error("Failed to load assistantMessages:", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
   useEffect(() => {
     if (!app) return;
-    const db = getFirestore(app);
-    const ref = collection(db, "messages");
-    const unsub = onSnapshot(ref, (querySnapshot: any) => {
-      const snapshotData: any[] = [];
-      querySnapshot.forEach((doc: any) => {
-        snapshotData.push(doc.data());
-      });
-      setMessages(snapshotData);
-    });
-    return () => unsub();
+    let cancelled = false;
+    (async () => {
+      try {
+        const db = getFirestore(app);
+        const ref = collection(db, "messages");
+        const snap = await getDocs(ref);
+        const snapshotData = snap.docs.map((d) => d.data());
+        if (!cancelled) setMessages(snapshotData);
+      } catch (e) {
+        console.error("Failed to load messages:", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
   const pathname = usePathname();
   const [isNavOpen, setNavOpen] = useState(false);

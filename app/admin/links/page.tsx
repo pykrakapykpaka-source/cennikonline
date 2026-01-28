@@ -3,23 +3,28 @@ import { app } from "@/common/firebase";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
-import { collection, getFirestore, onSnapshot } from "firebase/firestore";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { useSelector } from "react-redux";
 export default function Page() {
   const [links, setLinks] = useState<any[]>([]);
   const { light } = useSelector((state: any) => state.light);
   useEffect(() => {
     if (!app) return;
-    const db = getFirestore(app);
-    const ref = collection(db, "links");
-    const unsub = onSnapshot(ref, (querySnapshot: any) => {
-      const snapshotData: any[] = [];
-      querySnapshot.forEach((doc: any) => {
-        snapshotData.push(doc.data());
-      });
-      setLinks(snapshotData);
-    });
-    return () => unsub();
+    let cancelled = false;
+    (async () => {
+      try {
+        const db = getFirestore(app);
+        const ref = collection(db, "links");
+        const snap = await getDocs(ref);
+        const snapshotData = snap.docs.map((d) => d.data());
+        if (!cancelled) setLinks(snapshotData);
+      } catch (e) {
+        console.error("Failed to load links:", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (

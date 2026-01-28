@@ -2,7 +2,7 @@
 import { app, updateLead } from "@/common/firebase";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { collection, onSnapshot, getFirestore } from "firebase/firestore";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
 import "moment/locale/pl";
 import Link from "next/link";
 import { FaLongArrowAltLeft } from "react-icons/fa";
@@ -29,29 +29,33 @@ export default function Leads() {
   const [noteContent, setNoteContent] = useState<any>("");
   useEffect(() => {
     if (!app) return;
-    const db = getFirestore(app);
-    const ref = collection(db, "leads");
     setIsLoading(true);
     setLoadError(null);
-    const unsub = onSnapshot(
-      ref,
-      (querySnapshot: any) => {
-        const snapshotData: any[] = [];
-        querySnapshot.forEach((doc: any) => {
-          snapshotData.push({ id: doc.id, ...doc.data() });
-        });
-        setLeads(
-          snapshotData.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1))
-        );
-        setIsLoading(false);
-      },
-      (err: any) => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const db = getFirestore(app);
+        const ref = collection(db, "leads");
+        const snap = await getDocs(ref);
+        const snapshotData = snap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        if (!cancelled) {
+          setLeads(
+            snapshotData.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1))
+          );
+        }
+      } catch (err: any) {
         console.error("Failed to load leads:", err);
-        setLoadError(err?.message || "Failed to load leads");
-        setIsLoading(false);
+        if (!cancelled) setLoadError(err?.message || "Failed to load leads");
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
-    );
-    return () => unsub();
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
   moment.locale("pl");
   const newLeadsCount = leads.filter((lead: any) => {

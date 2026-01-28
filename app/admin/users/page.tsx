@@ -1,32 +1,11 @@
-import { getPublicSessions } from "@/common/firebase";
-
 export default async function Page() {
-  const publicSessions = await getPublicSessions();
   return (
-    <div className="grid grid-cols-1">
-      {publicSessions.map((item: any, i: any) => (
-        <>
-          {item.messages.length > 0 && (
-            <div key={i}>
-              {item.messages.map((message: any, i: number) => (
-                <div
-                  className={`${
-                    message.role === "user" ? "bg-green-500" : "bg-gray-500"
-                  }`}
-                  key={i}
-                >
-                  {message.role === "user" && (
-                    <b className="font-bold text-xl">
-                      PYTANIE OD UŻYTKOWNIKA: <b>{message.content}</b>
-                    </b>
-                  )}
-                  {message.role === "assistant" && <>{message.content}</>}
-                </div>
-              ))}
-            </div>
-          )}
-        </>
-      ))}
+    <div className="p-6">
+      <div className="font-bold text-xl">Public sessions</div>
+      <div className="mt-2 text-zinc-600">
+        Ten widok został usunięty — logika <code>publicSessions</code> nie jest
+        już używana w aplikacji.
+      </div>
     </div>
   );
 }
