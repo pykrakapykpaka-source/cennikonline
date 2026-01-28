@@ -27,6 +27,18 @@ export default function Leads() {
   const [isLoading, setIsLoading] = useState(true);
   const [isNoteOpen, setIsNoteOpen] = useState<any>();
   const [noteContent, setNoteContent] = useState<any>("");
+
+  const toMillis = (value: any) => {
+    if (!value) return 0;
+    if (typeof value === "number") return value;
+    if (typeof value === "string") {
+      const t = new Date(value).getTime();
+      return Number.isFinite(t) ? t : 0;
+    }
+    if (typeof value?.toDate === "function") return value.toDate().getTime();
+    if (typeof value?.seconds === "number") return value.seconds * 1000;
+    return 0;
+  };
   useEffect(() => {
     if (!app) return;
     setIsLoading(true);
@@ -37,13 +49,15 @@ export default function Leads() {
         const db = getFirestore(app);
         const ref = collection(db, "leads");
         const snap = await getDocs(ref);
-        const snapshotData = snap.docs.map((doc) => ({
+        const snapshotData: any[] = snap.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data(),
+          ...(doc.data() as any),
         }));
         if (!cancelled) {
           setLeads(
-            snapshotData.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1))
+            snapshotData.sort(
+              (a, b) => toMillis(b?.createdAt) - toMillis(a?.createdAt)
+            )
           );
         }
       } catch (err: any) {

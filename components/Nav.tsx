@@ -84,11 +84,6 @@ export default function Nav({
           href: `/admin/leads/courses`,
           icon: <FaUser />,
         },
-        {
-          title: "Aplikacje",
-          href: `/admin/leads/applications`,
-          icon: <FaUser />,
-        },
       ],
     },
     {
