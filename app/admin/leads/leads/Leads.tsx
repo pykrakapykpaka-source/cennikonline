@@ -2,7 +2,7 @@
 import { app, updateLead } from "@/common/firebase";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { collection, getDocs, getFirestore } from "firebase/firestore";
+import { collection, getFirestore, onSnapshot } from "firebase/firestore";
 import "moment/locale/pl";
 import Link from "next/link";
 import { FaLongArrowAltLeft } from "react-icons/fa";
@@ -39,37 +39,48 @@ export default function Leads() {
     if (typeof value?.seconds === "number") return value.seconds * 1000;
     return 0;
   };
+
+  const applyOptimisticLead = (id: string, nextLead: any) => {
+    setLeads((prev) => {
+      const updated = prev.map((l: any) =>
+        l?.id === id ? { ...l, ...nextLead, id } : l
+      );
+      return updated.sort((a: any, b: any) => toMillis(b?.createdAt) - toMillis(a?.createdAt));
+    });
+  };
+
+  const updateLeadOptimistic = async (id: string, data: any) => {
+    applyOptimisticLead(id, data);
+    await updateLead(id, data);
+  };
   useEffect(() => {
     if (!app) return;
     setIsLoading(true);
     setLoadError(null);
-    let cancelled = false;
-    (async () => {
-      try {
-        const db = getFirestore(app);
-        const ref = collection(db, "leads");
-        const snap = await getDocs(ref);
+
+    const db = getFirestore(app);
+    const ref = collection(db, "leads");
+
+    const unsubscribe = onSnapshot(
+      ref,
+      (snap) => {
         const snapshotData: any[] = snap.docs.map((doc) => ({
           id: doc.id,
           ...(doc.data() as any),
         }));
-        if (!cancelled) {
-          setLeads(
-            snapshotData.sort(
-              (a, b) => toMillis(b?.createdAt) - toMillis(a?.createdAt)
-            )
-          );
-        }
-      } catch (err: any) {
-        console.error("Failed to load leads:", err);
-        if (!cancelled) setLoadError(err?.message || "Failed to load leads");
-      } finally {
-        if (!cancelled) setIsLoading(false);
+        setLeads(
+          snapshotData.sort((a, b) => toMillis(b?.createdAt) - toMillis(a?.createdAt))
+        );
+        setIsLoading(false);
+      },
+      (err: any) => {
+        console.error("Failed to subscribe to leads:", err);
+        setLoadError(err?.message || "Failed to subscribe to leads");
+        setIsLoading(false);
       }
-    })();
-    return () => {
-      cancelled = true;
-    };
+    );
+
+    return () => unsubscribe();
   }, []);
   moment.locale("pl");
   const newLeadsCount = leads.filter((lead: any) => {
@@ -131,7 +142,10 @@ export default function Leads() {
                 const content = draftToHtml(
                   convertToRaw(noteContent.getCurrentContent())
                 );
-                updateLead(isNoteOpen.id, { ...isNoteOpen, note: content });
+                updateLeadOptimistic(isNoteOpen.id, {
+                  ...isNoteOpen,
+                  note: content,
+                });
                 setNoteOpen(undefined);
               }}
               className="w-full bg-green-500 hover:bg-green-400 font-gotham p-3 text-white font-bold"
@@ -163,7 +177,7 @@ export default function Leads() {
               onClick={() => {
                 setIsAnimating(true);
                 setTimeout(() => {
-                  updateLead(signingLead.id, {
+                  updateLeadOptimistic(signingLead.id, {
                     ...signingLead,
                     signed: true,
                   });
@@ -257,6 +271,7 @@ export default function Leads() {
                 signingLead={signingLead}
                 key={lead.id ?? i}
                 lead={lead}
+                onOptimisticUpdate={applyOptimisticLead}
                 setSigningLead={setSigningLead}
                 setNoteOpen={setNoteOpen}
                 setIsSigning={setIsSigning}

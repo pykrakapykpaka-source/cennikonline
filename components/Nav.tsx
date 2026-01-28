@@ -28,7 +28,6 @@ export default function Nav({
 
   const navItems = [
     { title: "Przegląd", href: `/admin`, icon: <FaHome /> },
-    { title: "Czaty z Asystentem", href: `/admin/users`, icon: <FaUsers /> },
     {
       title: "Zaproszenia",
       href: `/admin/links`,

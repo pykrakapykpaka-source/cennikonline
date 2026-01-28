@@ -1,5 +1,5 @@
 "use client";
-import { auth, deleteLead, updateLead } from "@/common/firebase";
+import { auth, deleteLead, updateLead as updateLeadRemote } from "@/common/firebase";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,6 +21,7 @@ export default function Lead({
   setSigningLead,
   setNoteOpen,
   signingLead,
+  onOptimisticUpdate,
 }: {
   forceVisibility?: boolean;
   lead: any;
@@ -31,6 +32,7 @@ export default function Lead({
   setSigningLead: any;
   setNoteOpen: any;
   signingLead: any;
+  onOptimisticUpdate?: (id: string, nextLead: any) => void;
 }) {
   const [user, loading] = useAuthState(auth);
   const [optionsOpen, setOptionsOpen] = useState(false);
@@ -38,6 +40,12 @@ export default function Lead({
   const [animationStarted, setAnimationStarted] = useState(false);
   const [animationCheck, setAnimationCheck] = useState(false);
   const [trashLead, setTrashLead] = useState<any>();
+
+  // Wrap Firestore updates to also update UI immediately (optimistic).
+  const updateLead = async (id: string, data: any) => {
+    onOptimisticUpdate?.(id, data);
+    return await updateLeadRemote(id, data);
+  };
 
   const allowedEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
     .split(",")

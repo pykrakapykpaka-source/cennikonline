@@ -13,7 +13,6 @@ import { usePathname } from "next/navigation";
 import { collection, getDocs, getFirestore } from "firebase/firestore";
 import dynamic from "next/dynamic";
 import Toast from "@/components/Toast";
-import Assistant from "@/components/assistant/Assistant";
 const Nav = dynamic(() => import("@/components/Nav"), { ssr: false });
 export default function AdminLayout({
   children,
@@ -21,26 +20,6 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [messages, setMessages] = useState<any[]>([]);
-  const [assistantMessages, setAssistantMessages] = useState<any[]>([]);
-  const [mode, setMode] = useState("assistantMessages");
-  useEffect(() => {
-    if (!app) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const db = getFirestore(app);
-        const ref = collection(db, "assistantMessages");
-        const snap = await getDocs(ref);
-        const snapshotData = snap.docs.map((d) => d.data());
-        if (!cancelled) setAssistantMessages(snapshotData);
-      } catch (e) {
-        console.error("Failed to load assistantMessages:", e);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
   useEffect(() => {
     if (!app) return;
     let cancelled = false;
@@ -76,8 +55,6 @@ export default function AdminLayout({
   return (
     <>
       <Toast />
-
-      {/* <Assistant messages={assistantMessages} mode={mode} setMode={setMode} /> */}
       {!loading && (
         <div className="relative w-full overflow-x-hidden font-coco bg-[#404149] font-sans pb-48">
           <button

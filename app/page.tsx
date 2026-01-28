@@ -7,7 +7,6 @@ import Opinions from "@/components/opinions/Opinions";
 import CountToTheNumberAnimated from "@/components/counter/CountToTheNumberAnimated";
 import Link from "next/link";
 import Map from "@/components/Map";
-import AssistantAI from "@/components/AssistantAI";
 import ClientFormWrapper from "@/components/cta/ClientFormWrapper";
 import Faq from "@/components/faq";
 import { DEFAULT_FAQS } from "@/components/faq/faqs";
@@ -59,7 +58,6 @@ export default async function Page({
     <>
       <ClientFormWrapper searchParams={ref} />
       <div className="font-sans w-full h-full bg-black/90 text-slate-100">
-        <AssistantAI />
         <Header  />
         <div className="z-[1500] absolute w-[130px] sm:w-[300px] h-[50px] left-0 top-6 xl:top-12 overflow-hidden rounded-r-xl">
           <div className="w-full flex items-start relative">
